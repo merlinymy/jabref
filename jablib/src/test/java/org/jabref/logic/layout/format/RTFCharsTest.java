@@ -26,9 +26,9 @@ class RTFCharsTest {
     @ParameterizedTest
     @CsvSource({
             "'', ''",
-            "'hallo', 'hallo'",
-            "'R\\u233eflexions sur le timing de la quantit\\u233e', 'Réflexions sur le timing de la quantité'",
-            "'h\\'e1llo', 'h\\'allo'"
+            "hallo, hallo",
+            "R\\u233eflexions sur le timing de la quantit\\u233e, Réflexions sur le timing de la quantité",
+            "h\\'e1llo, h\\'allo"
     })
     void basicFormat(String expected, String input) {
         assertEquals(expected, formatter.format(input));
