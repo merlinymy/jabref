@@ -36,13 +36,13 @@ class RTFCharsTest {
 
     @ParameterizedTest
     @CsvSource({
-            "'{\\i hallo}', '\\emph{hallo}'",
-            "'{\\i hallo}', '{\\emph hallo}'",
-            "'An article title with {\\i a book title} emphasized', 'An article title with \\emph{a book title} emphasized'",
-            "'{\\i hallo}', '\\textit{hallo}'",
-            "'{\\i hallo}', '{\\textit hallo}'",
-            "'{\\b hallo}', '\\textbf{hallo}'",
-            "'{\\b hallo}', '{\\textbf hallo}'"
+            "{\\i hallo}, \\emph{hallo}",
+            "{\\i hallo}, {\\emph hallo}",
+            "An article title with {\\i a book title} emphasized, An article title with \\emph{a book title} emphasized",
+            "{\\i hallo}, \\textit{hallo}",
+            "{\\i hallo}, {\\textit hallo}",
+            "{\\b hallo}, \\textbf{hallo}",
+            "{\\b hallo}, {\\textbf hallo}"
     })
     void laTeXHighlighting(String expected, String input) {
         assertEquals(expected, formatter.format(input));
