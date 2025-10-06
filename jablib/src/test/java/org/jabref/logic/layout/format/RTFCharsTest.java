@@ -1,12 +1,16 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -92,45 +96,49 @@ class RTFCharsTest {
                 formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig"));
     }
 
+    static Stream<Arguments> specialCharacterCases() {
+        return Stream.of(
+                Arguments.of("\\'f3", "\\'{o}"), // ó
+                Arguments.of("\\'f2", "\\`{o}"), // ò
+                Arguments.of("\\'f4", "\\^{o}"), // ô
+                Arguments.of("\\'f6", "\\\"{o}"), // ö
+                Arguments.of("\\u245o", "\\~{o}"), // õ
+                Arguments.of("\\u333o", "\\={o}"),
+                Arguments.of("\\u335o", "{\\uo}"),
+                Arguments.of("\\u231c", "{\\cc}"), // ç
+                Arguments.of("{\\u339oe}", "{\\oe}"),
+                Arguments.of("{\\u338OE}", "{\\OE}"),
+                Arguments.of("{\\u230ae}", "{\\ae}"), // æ
+                Arguments.of("{\\u198AE}", "{\\AE}"), // Æ
+
+                Arguments.of("", "\\.{o}"), // ???
+                Arguments.of("", "\\vo"), // ???
+                Arguments.of("", "\\Ha"), // ã // ???
+                Arguments.of("", "\\too"),
+                Arguments.of("", "\\do"), // ???
+                Arguments.of("", "\\bo"), // ???
+
+                Arguments.of("\\u229a", "{\\aa}"), // å
+                Arguments.of("\\u197A", "{\\AA}"), // Å
+                Arguments.of("\\u248o", "{\\o}"), // ø
+                Arguments.of("\\u216O", "{\\O}"), // Ø
+                Arguments.of("\\u322l", "{\\l}"),
+                Arguments.of("\\u321L", "{\\L}"),
+                Arguments.of("\\u223ss", "{\\ss}"), // ß
+                Arguments.of("\\u191?", "\\`?"), // ¿
+                Arguments.of("\\u161!", "\\`!"), // ¡
+
+                Arguments.of("", "\\dag"),
+                Arguments.of("", "\\ddag"),
+                Arguments.of("\\u167S", "{\\S}"), // §
+                Arguments.of("\\u182P", "{\\P}"), // ¶
+                Arguments.of("\\u169?", "{\\copyright}"), // ©
+                Arguments.of("\\u163?", "{\\pounds}") // £
+        );
+    }
+
     @ParameterizedTest
-    @CsvSource({
-            "'\\'f3', '\\'{o}'",        // ó
-            "\\'f2, '\\`{o}'",        // ò
-            "\\'f4, '\\^{o}'",        // ô
-            "\\'f6, '\\\"{o}'",       // ö
-            "'\\u245o', '\\~{o}'",      // õ
-            "'\\u333o', '\\={o}'",
-            "'\\u335o', '{\\uo}'",
-            "'\\u231c', '{\\cc}'",      // ç
-            "'{\\u339oe}', '{\\oe}'",
-            "'{\\u338OE}', '{\\OE}'",
-            "'{\\u230ae}', '{\\ae}'",   // æ
-            "'{\\u198AE}', '{\\AE}'",   // Æ
-
-            "'', '\\.{o}'",             // ???
-            "'', '\\vo'",               // ???
-            "'', '\\Ha'",               // ã ???
-            "'', '\\too'",
-            "'', '\\do'",               // ???
-            "'', '\\bo'",               // ???
-
-            "'\\u229a', '{\\aa}'",      // å
-            "'\\u197A', '{\\AA}'",      // Å
-            "'\\u248o', '{\\o}'",       // ø
-            "'\\u216O', '{\\O}'",       // Ø
-            "'\\u322l', '{\\l}'",
-            "'\\u321L', '{\\L}'",
-            "'\\u223ss', '{\\ss}'",     // ß
-            "'\\u191?', '\\`?'",        // ¿
-            "'\\u161!', '\\`!'",        // ¡
-
-            "'', '\\dag'",
-            "'', '\\ddag'",
-            "'\\u167S', '{\\S}'",       // §
-            "'\\u182P', '{\\P}'",       // ¶
-            "'\\u169?', '{\\copyright}'", // ©
-            "'\\u163?', '{\\pounds}'"   // £
-    })
+    @MethodSource("specialCharacterCases")
     void specialCharacters(String expected, String input) {
         assertEquals(expected, formatter.format(input));
     }
