@@ -1,12 +1,16 @@
 package org.jabref.logic.layout.format;
 
+import java.util.stream.Stream;
+
 import org.jabref.logic.layout.LayoutFormatter;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -23,30 +27,29 @@ class RTFCharsTest {
         formatter = null;
     }
 
-    @Test
-    void basicFormat() {
-        assertEquals("", formatter.format(""));
-
-        assertEquals("hallo", formatter.format("hallo"));
-
-        assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e",
-                formatter.format("Réflexions sur le timing de la quantité"));
-
-        assertEquals("h\\'e1llo", formatter.format("h\\'allo"));
-        assertEquals("h\\'e1llo", formatter.format("h\\'allo"));
+    @ParameterizedTest
+    @CsvSource({
+            "'', ''",
+            "hallo, hallo",
+            "R\\u233eflexions sur le timing de la quantit\\u233e, Réflexions sur le timing de la quantité",
+            "h\\'e1llo, h\\'allo"
+    })
+    void basicFormat(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 
-    @Test
-    void laTeXHighlighting() {
-        assertEquals("{\\i hallo}", formatter.format("\\emph{hallo}"));
-        assertEquals("{\\i hallo}", formatter.format("{\\emph hallo}"));
-        assertEquals("An article title with {\\i a book title} emphasized", formatter.format("An article title with \\emph{a book title} emphasized"));
-
-        assertEquals("{\\i hallo}", formatter.format("\\textit{hallo}"));
-        assertEquals("{\\i hallo}", formatter.format("{\\textit hallo}"));
-
-        assertEquals("{\\b hallo}", formatter.format("\\textbf{hallo}"));
-        assertEquals("{\\b hallo}", formatter.format("{\\textbf hallo}"));
+    @ParameterizedTest
+    @CsvSource({
+            "{\\i hallo}, \\emph{hallo}",
+            "{\\i hallo}, {\\emph hallo}",
+            "An article title with {\\i a book title} emphasized, An article title with \\emph{a book title} emphasized",
+            "{\\i hallo}, \\textit{hallo}",
+            "{\\i hallo}, {\\textit hallo}",
+            "{\\b hallo}, \\textbf{hallo}",
+            "{\\b hallo}, {\\textbf hallo}"
+    })
+    void laTeXHighlighting(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 
     @Test
@@ -93,43 +96,51 @@ class RTFCharsTest {
                 formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig"));
     }
 
-    @Test
-    void specialCharacters() {
-        assertEquals("\\'f3", formatter.format("\\'{o}")); // ó
-        assertEquals("\\'f2", formatter.format("\\`{o}")); // ò
-        assertEquals("\\'f4", formatter.format("\\^{o}")); // ô
-        assertEquals("\\'f6", formatter.format("\\\"{o}")); // ö
-        assertEquals("\\u245o", formatter.format("\\~{o}")); // õ
-        assertEquals("\\u333o", formatter.format("\\={o}"));
-        assertEquals("\\u335o", formatter.format("{\\uo}"));
-        assertEquals("\\u231c", formatter.format("{\\cc}")); // ç
-        assertEquals("{\\u339oe}", formatter.format("{\\oe}"));
-        assertEquals("{\\u338OE}", formatter.format("{\\OE}"));
-        assertEquals("{\\u230ae}", formatter.format("{\\ae}")); // æ
-        assertEquals("{\\u198AE}", formatter.format("{\\AE}")); // Æ
+    static Stream<Arguments> specialCharacterCases() {
+        return Stream.of(
+                Arguments.of("\\'f3", "\\'{o}"), // ó
+                Arguments.of("\\'f2", "\\`{o}"), // ò
+                Arguments.of("\\'f4", "\\^{o}"), // ô
+                Arguments.of("\\'f6", "\\\"{o}"), // ö
+                Arguments.of("\\u245o", "\\~{o}"), // õ
+                Arguments.of("\\u333o", "\\={o}"),
+                Arguments.of("\\u335o", "{\\uo}"),
+                Arguments.of("\\u231c", "{\\cc}"), // ç
+                Arguments.of("{\\u339oe}", "{\\oe}"),
+                Arguments.of("{\\u338OE}", "{\\OE}"),
+                Arguments.of("{\\u230ae}", "{\\ae}"), // æ
+                Arguments.of("{\\u198AE}", "{\\AE}"), // Æ
 
-        assertEquals("", formatter.format("\\.{o}")); // ???
-        assertEquals("", formatter.format("\\vo")); // ???
-        assertEquals("", formatter.format("\\Ha")); // ã // ???
-        assertEquals("", formatter.format("\\too"));
-        assertEquals("", formatter.format("\\do")); // ???
-        assertEquals("", formatter.format("\\bo")); // ???
-        assertEquals("\\u229a", formatter.format("{\\aa}")); // å
-        assertEquals("\\u197A", formatter.format("{\\AA}")); // Å
-        assertEquals("\\u248o", formatter.format("{\\o}")); // ø
-        assertEquals("\\u216O", formatter.format("{\\O}")); // Ø
-        assertEquals("\\u322l", formatter.format("{\\l}"));
-        assertEquals("\\u321L", formatter.format("{\\L}"));
-        assertEquals("\\u223ss", formatter.format("{\\ss}")); // ß
-        assertEquals("\\u191?", formatter.format("\\`?")); // ¿
-        assertEquals("\\u161!", formatter.format("\\`!")); // ¡
+                Arguments.of("", "\\.{o}"), // ???
+                Arguments.of("", "\\vo"), // ???
+                Arguments.of("", "\\Ha"), // ã // ???
+                Arguments.of("", "\\too"),
+                Arguments.of("", "\\do"), // ???
+                Arguments.of("", "\\bo"), // ???
 
-        assertEquals("", formatter.format("\\dag"));
-        assertEquals("", formatter.format("\\ddag"));
-        assertEquals("\\u167S", formatter.format("{\\S}")); // §
-        assertEquals("\\u182P", formatter.format("{\\P}")); // ¶
-        assertEquals("\\u169?", formatter.format("{\\copyright}")); // ©
-        assertEquals("\\u163?", formatter.format("{\\pounds}")); // £
+                Arguments.of("\\u229a", "{\\aa}"), // å
+                Arguments.of("\\u197A", "{\\AA}"), // Å
+                Arguments.of("\\u248o", "{\\o}"), // ø
+                Arguments.of("\\u216O", "{\\O}"), // Ø
+                Arguments.of("\\u322l", "{\\l}"),
+                Arguments.of("\\u321L", "{\\L}"),
+                Arguments.of("\\u223ss", "{\\ss}"), // ß
+                Arguments.of("\\u191?", "\\`?"), // ¿
+                Arguments.of("\\u161!", "\\`!"), // ¡
+
+                Arguments.of("", "\\dag"),
+                Arguments.of("", "\\ddag"),
+                Arguments.of("\\u167S", "{\\S}"), // §
+                Arguments.of("\\u182P", "{\\P}"), // ¶
+                Arguments.of("\\u169?", "{\\copyright}"), // ©
+                Arguments.of("\\u163?", "{\\pounds}") // £
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("specialCharacterCases")
+    void specialCharacters(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 
     @ParameterizedTest(name = "specialChar={0}, formattedStr={1}")
@@ -185,59 +196,65 @@ class RTFCharsTest {
         assertEquals(expectedResult, formattedStr);
     }
 
-    @Test
-    void rtfCharacters() {
-        assertEquals("\\'e0", formatter.format("\\`{a}"));
-        assertEquals("\\'e8", formatter.format("\\`{e}"));
-        assertEquals("\\'ec", formatter.format("\\`{i}"));
-        assertEquals("\\'f2", formatter.format("\\`{o}"));
-        assertEquals("\\'f9", formatter.format("\\`{u}"));
+    @ParameterizedTest
+    @CsvSource({
+            "\\'e0, \\`{a}",
+            "\\'e8, \\`{e}",
+            "\\'ec, \\`{i}",
+            "\\'f2, \\`{o}",
+            "\\'f9, \\`{u}",
 
-        assertEquals("\\'e1", formatter.format("\\'a"));
-        assertEquals("\\'e9", formatter.format("\\'e"));
-        assertEquals("\\'ed", formatter.format("\\'i"));
-        assertEquals("\\'f3", formatter.format("\\'o"));
-        assertEquals("\\'fa", formatter.format("\\'u"));
+            "\\'e1, \\'a",
+            "\\'e9, \\'e",
+            "\\'ed, \\'i",
+            "\\'f3, \\'o",
+            "\\'fa, \\'u",
 
-        assertEquals("\\'e2", formatter.format("\\^a"));
-        assertEquals("\\'ea", formatter.format("\\^e"));
-        assertEquals("\\'ee", formatter.format("\\^i"));
-        assertEquals("\\'f4", formatter.format("\\^o"));
-        assertEquals("\\'fa", formatter.format("\\^u"));
+            "\\'e2, \\^a",
+            "\\'ea, \\^e",
+            "\\'ee, \\^i",
+            "\\'f4, \\^o",
+            "\\'fa, \\^u",
 
-        assertEquals("\\'e4", formatter.format("\\\"a"));
-        assertEquals("\\'eb", formatter.format("\\\"e"));
-        assertEquals("\\'ef", formatter.format("\\\"i"));
-        assertEquals("\\'f6", formatter.format("\\\"o"));
-        assertEquals("\\u252u", formatter.format("\\\"u"));
+            "\\'e4, \\\"a",
+            "\\'eb, \\\"e",
+            "\\'ef, \\\"i",
+            "\\'f6, \\\"o",
+            "\\u252u, \\\"u",
 
-        assertEquals("\\'f1", formatter.format("\\~n"));
+            "\\'f1, \\~n"
+    })
+    void rtfCharacters(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 
-    @Test
-    void rTFCharactersCapital() {
-        assertEquals("\\'c0", formatter.format("\\`A"));
-        assertEquals("\\'c8", formatter.format("\\`E"));
-        assertEquals("\\'cc", formatter.format("\\`I"));
-        assertEquals("\\'d2", formatter.format("\\`O"));
-        assertEquals("\\'d9", formatter.format("\\`U"));
+    @ParameterizedTest
+    @CsvSource({
+            "\\'c0, \\`A",
+            "\\'c8, \\`E",
+            "\\'cc, \\`I",
+            "\\'d2, \\`O",
+            "\\'d9, \\`U",
 
-        assertEquals("\\'c1", formatter.format("\\'A"));
-        assertEquals("\\'c9", formatter.format("\\'E"));
-        assertEquals("\\'cd", formatter.format("\\'I"));
-        assertEquals("\\'d3", formatter.format("\\'O"));
-        assertEquals("\\'da", formatter.format("\\'U"));
+            "\\'c1, \\'A",
+            "\\'c9, \\'E",
+            "\\'cd, \\'I",
+            "\\'d3, \\'O",
+            "\\'da, \\'U",
 
-        assertEquals("\\'c2", formatter.format("\\^A"));
-        assertEquals("\\'ca", formatter.format("\\^E"));
-        assertEquals("\\'ce", formatter.format("\\^I"));
-        assertEquals("\\'d4", formatter.format("\\^O"));
-        assertEquals("\\'db", formatter.format("\\^U"));
+            "\\'c2, \\^A",
+            "\\'ca, \\^E",
+            "\\'ce, \\^I",
+            "\\'d4, \\^O",
+            "\\'db, \\^U",
 
-        assertEquals("\\'c4", formatter.format("\\\"A"));
-        assertEquals("\\'cb", formatter.format("\\\"E"));
-        assertEquals("\\'cf", formatter.format("\\\"I"));
-        assertEquals("\\'d6", formatter.format("\\\"O"));
-        assertEquals("\\'dc", formatter.format("\\\"U"));
+            "\\'c4, \\\"A",
+            "\\'cb, \\\"E",
+            "\\'cf, \\\"I",
+            "\\'d6, \\\"O",
+            "\\'dc, \\\"U"
+    })
+    void rTFCharactersCapital(String expected, String input) {
+        assertEquals(expected, formatter.format(input));
     }
 }

@@ -73,32 +73,38 @@ class LayoutEntryTest {
         return layout.doLayout(entry, null);
     }
 
-    @Test
-    void parseMethodCalls() {
-        assertEquals(1, LayoutEntry.parseMethodsCalls("bla").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla").getFirst().getFirst());
+    @ParameterizedTest
+    @CsvSource(value = {
+            "bla; bla",
+            "bla,; bla",
+            "_bla.bla.blub,; _bla.bla.blub"
+    }, delimiter = ';')
+    void parseMethodCallsSingleNoArgs(String input, String expected) {
+        assertEquals(1, LayoutEntry.parseMethodsCalls(input).size());
+        assertEquals(expected, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
+    }
 
-        assertEquals(1, LayoutEntry.parseMethodsCalls("bla,").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla,").getFirst().getFirst());
+    @ParameterizedTest
+    @CsvSource(value = {
+            "bla,foo; bla; foo"
+    }, delimiter = ';')
+    void parseMethodCallsTwoNoArgs(String input, String expectedFirst, String expectedSecond) {
+        assertEquals(2, LayoutEntry.parseMethodsCalls(input).size());
+        assertEquals(expectedFirst, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
+        assertEquals(expectedSecond, LayoutEntry.parseMethodsCalls(input).get(1).getFirst());
+    }
 
-        assertEquals(1, LayoutEntry.parseMethodsCalls("_bla.bla.blub,").size());
-        assertEquals("_bla.bla.blub", LayoutEntry.parseMethodsCalls("_bla.bla.blub,").getFirst().getFirst());
-
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla,foo").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla,foo").getFirst().getFirst());
-        assertEquals("foo", LayoutEntry.parseMethodsCalls("bla,foo").get(1).getFirst());
-
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").getFirst().getFirst());
-        assertEquals("foo", LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1).getFirst());
-        assertEquals("test", LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").getFirst().get(1));
-        assertEquals("fark", LayoutEntry.parseMethodsCalls("bla(\"test\"),foo(\"fark\")").get(1).get(1));
-
-        assertEquals(2, LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").size());
-        assertEquals("bla", LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").getFirst().getFirst());
-        assertEquals("foo", LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1).getFirst());
-        assertEquals("test", LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").getFirst().get(1));
-        assertEquals("fark", LayoutEntry.parseMethodsCalls("bla(test),foo(fark)").get(1).get(1));
+    @ParameterizedTest
+    @CsvSource(value = {
+            "bla(\"test\"),foo(\"fark\"); bla; foo; test; fark",
+            "bla(test),foo(fark); bla; foo; test; fark"
+    }, delimiter = ';')
+    void parseMethodCallsTwoWithArgs(String input, String name1, String name2, String arg1, String arg2) {
+        assertEquals(2, LayoutEntry.parseMethodsCalls(input).size());
+        assertEquals(name1, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
+        assertEquals(name2, LayoutEntry.parseMethodsCalls(input).get(1).getFirst());
+        assertEquals(arg1, LayoutEntry.parseMethodsCalls(input).getFirst().get(1));
+        assertEquals(arg2, LayoutEntry.parseMethodsCalls(input).get(1).get(1));
     }
 
     @ParameterizedTest
