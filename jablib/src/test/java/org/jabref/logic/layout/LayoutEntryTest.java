@@ -15,7 +15,6 @@ import org.jabref.model.entry.field.UnknownField;
 import org.jabref.model.metadata.MetaData;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 

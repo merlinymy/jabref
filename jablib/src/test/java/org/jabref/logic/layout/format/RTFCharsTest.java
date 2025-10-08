@@ -103,33 +103,33 @@ class RTFCharsTest {
                 Arguments.of("\\'f4", "\\^{o}"), // ô
                 Arguments.of("\\'f6", "\\\"{o}"), // ö
                 Arguments.of("\\u245o", "\\~{o}"), // õ
-                Arguments.of("\\u333o", "\\={o}"),
-                Arguments.of("\\u335o", "{\\uo}"),
+                Arguments.of("\\u333o", "\\={o}"), // ō
+                Arguments.of("\\u335o", "{\\uo}"), // ŏ
                 Arguments.of("\\u231c", "{\\cc}"), // ç
-                Arguments.of("{\\u339oe}", "{\\oe}"),
-                Arguments.of("{\\u338OE}", "{\\OE}"),
+                Arguments.of("{\\u339oe}", "{\\oe}"), // œ
+                Arguments.of("{\\u338OE}", "{\\OE}"), // Œ
                 Arguments.of("{\\u230ae}", "{\\ae}"), // æ
                 Arguments.of("{\\u198AE}", "{\\AE}"), // Æ
 
-                Arguments.of("", "\\.{o}"), // ???
-                Arguments.of("", "\\vo"), // ???
-                Arguments.of("", "\\Ha"), // ã // ???
-                Arguments.of("", "\\too"),
-                Arguments.of("", "\\do"), // ???
-                Arguments.of("", "\\bo"), // ???
+                Arguments.of("", "\\.{o}"), // ȯ
+                Arguments.of("", "\\vo"), // ǒ
+                Arguments.of("", "\\Ha"), // a̋
+                Arguments.of("", "\\too"), // o͡o
+                Arguments.of("", "\\do"), // ọ
+                Arguments.of("", "\\bo"), // o̱ (o with macron below/bar below)
 
                 Arguments.of("\\u229a", "{\\aa}"), // å
                 Arguments.of("\\u197A", "{\\AA}"), // Å
                 Arguments.of("\\u248o", "{\\o}"), // ø
                 Arguments.of("\\u216O", "{\\O}"), // Ø
-                Arguments.of("\\u322l", "{\\l}"),
-                Arguments.of("\\u321L", "{\\L}"),
+                Arguments.of("\\u322l", "{\\l}"), // ł
+                Arguments.of("\\u321L", "{\\L}"), // Ł
                 Arguments.of("\\u223ss", "{\\ss}"), // ß
                 Arguments.of("\\u191?", "\\`?"), // ¿
                 Arguments.of("\\u161!", "\\`!"), // ¡
 
-                Arguments.of("", "\\dag"),
-                Arguments.of("", "\\ddag"),
+                Arguments.of("", "\\dag"), // † (dagger)
+                Arguments.of("", "\\ddag"), // ‡ (double dagger)
                 Arguments.of("\\u167S", "{\\S}"), // §
                 Arguments.of("\\u182P", "{\\P}"), // ¶
                 Arguments.of("\\u169?", "{\\copyright}"), // ©
