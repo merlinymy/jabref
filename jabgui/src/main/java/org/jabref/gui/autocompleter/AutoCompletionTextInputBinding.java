@@ -74,6 +74,9 @@ public class AutoCompletionTextInputBinding<T> extends AutoCompletionBinding<T> 
         getCompletionTarget().focusedProperty().addListener(focusChangedListener);
     }
 
+    /**
+    *  Builder for AutoCompletionTextInputBinding.
+    */
     public static class Builder<T> {
             // required parameters
             private final TextInputControl textInputControl;
