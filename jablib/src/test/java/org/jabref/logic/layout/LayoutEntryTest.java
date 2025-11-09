@@ -76,35 +76,35 @@ class LayoutEntryTest {
     @ParameterizedTest
     @CsvSource(value = {
             "bla; bla",
-            "bla,; bla",
-            "_bla.bla.blub,; _bla.bla.blub"
+            "bla; bla,",
+            "_bla.bla.blub; _bla.bla.blub,"
     }, delimiter = ';')
-    void parseMethodCallsSingleNoArgs(String input, String expected) {
+    void parseSingleMethodWithoutArguments(String expected, String input) {
         assertEquals(1, LayoutEntry.parseMethodsCalls(input).size());
         assertEquals(expected, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
     }
 
-    @ParameterizedTest
-    @CsvSource(value = {
-            "bla,foo; bla; foo"
-    }, delimiter = ';')
-    void parseMethodCallsTwoNoArgs(String input, String expectedFirst, String expectedSecond) {
-        assertEquals(2, LayoutEntry.parseMethodsCalls(input).size());
-        assertEquals(expectedFirst, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
-        assertEquals(expectedSecond, LayoutEntry.parseMethodsCalls(input).get(1).getFirst());
+    @Test
+    void parseTwoMethodsWithoutArguments() {
+        String input = "bla,foo";
+        var result = LayoutEntry.parseMethodsCalls(input);
+        assertEquals(2, result.size());
+        assertEquals("bla", result.getFirst().getFirst());
+        assertEquals("foo", result.get(1).getFirst());
     }
 
     @ParameterizedTest
     @CsvSource(value = {
-            "bla(\"test\"),foo(\"fark\"); bla; foo; test; fark",
-            "bla(test),foo(fark); bla; foo; test; fark"
+            "bla; foo; test; fark; bla(\"test\"),foo(\"fark\")",
+            "bla; foo; test; fark; bla(test),foo(fark)"
     }, delimiter = ';')
-    void parseMethodCallsTwoWithArgs(String input, String name1, String name2, String arg1, String arg2) {
+    void parseTwoMethodsWithArguments(String expectedName1, String expectedName2,
+                                      String expectedArg1, String expectedArg2, String input) {
         assertEquals(2, LayoutEntry.parseMethodsCalls(input).size());
-        assertEquals(name1, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
-        assertEquals(name2, LayoutEntry.parseMethodsCalls(input).get(1).getFirst());
-        assertEquals(arg1, LayoutEntry.parseMethodsCalls(input).getFirst().get(1));
-        assertEquals(arg2, LayoutEntry.parseMethodsCalls(input).get(1).get(1));
+        assertEquals(expectedName1, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
+        assertEquals(expectedName2, LayoutEntry.parseMethodsCalls(input).get(1).getFirst());
+        assertEquals(expectedArg1, LayoutEntry.parseMethodsCalls(input).getFirst().get(1));
+        assertEquals(expectedArg2, LayoutEntry.parseMethodsCalls(input).get(1).get(1));
     }
 
     @ParameterizedTest
