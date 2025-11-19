@@ -74,11 +74,11 @@ class LayoutEntryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-            "bla; bla",
-            "bla; bla,",
-            "_bla.bla.blub; _bla.bla.blub,"
-    }, delimiter = ';')
+    @CsvSource(delimiterString = "->", textBlock = """
+            bla -> bla
+            bla -> bla,
+            _bla.bla.blub -> _bla.bla.blub,
+            """)
     void parseSingleMethodWithoutArguments(String expected, String input) {
         assertEquals(1, LayoutEntry.parseMethodsCalls(input).size());
         assertEquals(expected, LayoutEntry.parseMethodsCalls(input).getFirst().getFirst());
@@ -94,10 +94,10 @@ class LayoutEntryTest {
     }
 
     @ParameterizedTest
-    @CsvSource(value = {
-            "bla; foo; test; fark; bla(\"test\"),foo(\"fark\")",
-            "bla; foo; test; fark; bla(test),foo(fark)"
-    }, delimiter = ';')
+    @CsvSource(delimiterString = "->", textBlock = """
+            bla -> foo -> test -> fark -> bla(\"test\"),foo(\"fark\")
+            bla -> foo -> test -> fark -> bla(test),foo(fark)
+            """)
     void parseTwoMethodsWithArguments(String expectedName1, String expectedName2,
                                       String expectedArg1, String expectedArg2, String input) {
         assertEquals(2, LayoutEntry.parseMethodsCalls(input).size());
@@ -124,13 +124,13 @@ class LayoutEntryTest {
     }
 
     @ParameterizedTest
-    @CsvSource({
-            "1, testString",
-            "5, testString",
-            "8, UTF-8",
-            "9, ''",
-            "10, ''"
-    })
+    @CsvSource(delimiterString = "->", textBlock = """
+            1 -> testString
+            5 -> testString
+            8 -> UTF-8
+            9 -> ''
+            10 -> ''
+            """)
     void layoutResult(int type, String expectedValue) {
         List<StringInt> parsedEntries = List.of(new StringInt("place_holder", 0),
                 new StringInt("testString", 0));
